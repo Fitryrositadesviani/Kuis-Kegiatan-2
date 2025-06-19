@@ -43,7 +43,7 @@ soal_pilgan = [
 # ===================== TAMPILAN UTAMA =====================
 st.set_page_config(page_title="Kuis Interaktif Kegiatan 2", page_icon="🎮")
 st.title("🎮 Kuis Interaktif - Kegiatan 2")
-st.image("https://drive.google.com/file/d/1PncH0LZXlYMthG2YMC4DBBjp0kVmm1zs/view?usp=sharing", use_container_width=True)
+st.image("https://cdn.pixabay.com/photo/2018/01/29/18/16/cube-3116778_640.jpg", use_container_width=True)
 st.caption("Mengangkat nilai budaya dalam pembelajaran peluang 🎲 melalui permainan tradisional Cublak-Cublak Suweng.")
 
 # ===================== INPUT NAMA SISWA =====================
