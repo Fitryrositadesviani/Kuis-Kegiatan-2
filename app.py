@@ -1,11 +1,17 @@
 import streamlit as st
-import joblib
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
-# Inisialisasi session
-if "submitted" not in st.session_state:
-    st.session_state.submitted = False
+# ===================== SETUP GOOGLE SHEET =====================
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+client = gspread.authorize(creds)
 
-# Data soal pilihan ganda
+# Buka Spreadsheet
+spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1Mv08ZKODXyWbf75gMsb192OvTrVphy6mvoq_AypsPLA/edit")
+sheet = spreadsheet.sheet1  # gunakan sheet pertama
+
+# ===================== DATA SOAL =====================
 soal_pilgan = [
     {
         "soal": "1. Sari, Budi, Citra, Doni, dan Eka bermain Cublak-Cublak Suweng. Setelah hompimpa, Sari menjadi penebak dan duduk tengkurap di tengah, sedangkan 4 temannya duduk melingkar. Jika Sari menebak secara acak, berapakah peluang tebakannya benar?",
@@ -34,52 +40,56 @@ soal_pilgan = [
     }
 ]
 
-# Input nama siswa
+# ===================== TAMPILAN UTAMA =====================
+st.set_page_config(page_title="Kuis Interaktif Kegiatan 2", page_icon="🎮")
 st.title("🎮 Kuis Interaktif - Kegiatan 2")
+st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Wayang_Kulit_-_Museum_Sonobudoyo.jpg/640px-Wayang_Kulit_-_Museum_Sonobudoyo.jpg", use_container_width=True)
+st.caption("Mengangkat nilai budaya dalam pembelajaran peluang 🎲 melalui permainan tradisional Cublak-Cublak Suweng.")
+
+# ===================== INPUT NAMA SISWA =====================
 nama = st.text_input("Masukkan nama kamu:")
 
 if nama:
-    with st.form("kuis_form"):
+    with st.form("form_kuis"):
         st.subheader("📋 Soal Pilihan Ganda")
-
         jawaban_siswa = []
         for i, soal in enumerate(soal_pilgan):
             pilihan = st.radio(soal["soal"], soal["opsi"], key=f"soal_{i}")
             jawaban_siswa.append(pilihan)
+        kirim = st.form_submit_button("✅ Kirim Jawaban")
 
-        submit = st.form_submit_button("Kirim Jawaban")
-
-    if submit:
-        st.session_state.submitted = True
+    if kirim:
         benar = 0
-        feedback = []
+        pembahasan = []
 
         for i, soal in enumerate(soal_pilgan):
-            jawaban_user = jawaban_siswa[i][0]  # A/B/C/D
+            jawaban_user = jawaban_siswa[i][0]  # ambil huruf A/B/C/D
             kunci = soal["jawaban"]
             if jawaban_user == kunci:
                 benar += 1
-                feedback.append(f"✅ Soal {i+1}: Benar")
+                pembahasan.append(f"✅ Soal {i+1}: Benar")
             else:
-                feedback.append(f"❌ Soal {i+1}: Salah. Jawaban yang benar: {kunci}")
+                pembahasan.append(f"❌ Soal {i+1}: Salah. Jawaban benar: {kunci}")
 
         nilai = int((benar / len(soal_pilgan)) * 100)
-        st.success(f"Kamu menjawab benar {benar} dari {len(soal_pilgan)} soal.")
-        st.info(f"Nilai akhir kamu: {nilai}/100")
+
+        # Animasi
+        if nilai == 100:
+            st.balloons()
+        elif nilai >= 80:
+            st.snow()
+
+        # Hasil & Pembahasan
+        st.success(f"🎉 {nama}, kamu menjawab benar {benar} dari {len(soal_pilgan)} soal.")
+        st.info(f"📊 Nilai akhir kamu: {nilai}/100")
 
         with st.expander("🔍 Lihat Pembahasan"):
-            for line in feedback:
-                st.write(line)
+            for p in pembahasan:
+                st.write(p)
 
-        # Simpan hasil ke file .pkl
-        hasil = {
-            "nama": nama,
-            "skor": nilai,
-            "jawaban_benar": benar,
-            "jumlah_soal": len(soal_pilgan),
-            "jawaban_siswa": jawaban_siswa
-        }
-        joblib.dump(hasil, "hasil_kuis2.pkl")
-        with open("hasil_kuis2.pkl", "rb") as f:
-            st.download_button("📥 Unduh Hasil Kuis (.pkl)", data=f, file_name="hasil_kuis2.pkl")
-
+        # ===================== SIMPAN KE GOOGLE SHEET =====================
+        try:
+            sheet.append_row([nama, nilai, benar, len(soal_pilgan), str(jawaban_siswa)])
+            st.success("✅ Hasilmu berhasil disimpan ke Google Spreadsheet.")
+        except Exception as e:
+            st.error(f"Gagal menyimpan hasil: {e}")
