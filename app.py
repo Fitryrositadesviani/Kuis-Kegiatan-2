@@ -1,15 +1,15 @@
 import streamlit as st
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
-# ===================== SETUP GOOGLE SHEET =====================
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+# Ambil credential dari secrets
+creds_dict = st.secrets["google_service_account"]
+scopes = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+
 client = gspread.authorize(creds)
-
-# Buka Spreadsheet
 spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1Mv08ZKODXyWbf75gMsb192OvTrVphy6mvoq_AypsPLA/edit")
-sheet = spreadsheet.sheet1  # gunakan sheet pertama
+worksheet = spreadsheet.worksheet("sheet1")  # atau nama sheet kamu
 
 # ===================== DATA SOAL =====================
 soal_pilgan = [
