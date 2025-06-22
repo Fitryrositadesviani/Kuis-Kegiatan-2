@@ -2,11 +2,20 @@ import streamlit as st
 import joblib
 
 # === Konfigurasi halaman ===
-st.set_page_config(page_title="🎲 Kuis Peluang - Kegiatan 2", page_icon="🎲")
+st.set_page_config(page_title="Kuis Kegiatan 2", page_icon="🌷")
+
+# Background cokelat muda
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #f8f4f2;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # === Judul dan caption ===
-st.title("🎲 Kuis Interaktif - Kegiatan 2")
-st.caption("Topik: Peluang (Etnomatematika - Cublak-Cublak Suweng)")
+st.title("🎮 Kuis Interaktif - Kegiatan 2")
+st.caption("Topik: Peluang (Etnomatematika - Permainan Cublak-Cublak Suweng)")
 
 # === Petunjuk pengerjaan ===
 with st.expander("📌 Petunjuk Pengerjaan", expanded=True):
@@ -32,7 +41,7 @@ if not st.session_state.nama_dikunci:
 
 # === Jika nama sudah dikunci, tampilkan soal ===
 else:
-    st.success(f"Halo, {st.session_state.nama}! Yuk kita mulai kuisnya ✨")
+    st.success(f"Halo, {st.session_state.nama}! Silakan mengerjakan kuis di bawah ini. Semangat ya 🎯")
 
     jawaban_pengguna = []
     for i, soal in enumerate(soal_pilgan):
