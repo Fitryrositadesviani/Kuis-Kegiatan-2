@@ -5,7 +5,7 @@ import joblib
 st.set_page_config(page_title="Kuis Kegiatan 2", page_icon="🌷")
 
 # Background kuning muda
-theme_color = "#fff9c4"
+theme_color = "#f8f4f2"
 st.markdown(f"""
     <style>
     .stApp {{
@@ -71,7 +71,7 @@ else:
         st.markdown("---")
         st.subheader("🎓 Ringkasan Nilai Akhir")
         st.markdown(f"""
-            <div style='background-color: #fffde7; padding: 20px; border-radius: 10px; border: 1px solid #f0e68c;'>
+            <div style='background-color: #dec4b0; padding: 20px; border-radius: 10px; border: 1px solid #f0e68c;'>
                 <h4>Nama: <b>{st.session_state.nama}</b></h4>
                 <h5>Jawaban Benar: <b>{benar} dari {total_soal} soal</b></h5>
                 <h3 style='color:#d84315;'>🎉 Nilai Akhir: <b>{nilai}/100</b></h3>
