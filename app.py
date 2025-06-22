@@ -1,34 +1,35 @@
 import streamlit as st
 import joblib
 
-# === Konfigurasi halaman ===
+# ===== Konfigurasi Tampilan =====
 st.set_page_config(page_title="Kuis Kegiatan 2", page_icon="🌷")
 
-# Background cokelat muda
-st.markdown("""
+# Background kuning muda
+theme_color = "#fff9c4"
+st.markdown(f"""
     <style>
-    .stApp {
-        background-color: #f8f4f2;
-    }
+    .stApp {{
+        background-color: {theme_color};
+    }}
     </style>
 """, unsafe_allow_html=True)
 
-# === Judul dan caption ===
+# ===== Judul dan Deskripsi =====
 st.title("🎮 Kuis Interaktif - Kegiatan 2")
-st.caption("Topik: Peluang (Etnomatematika - Permainan Cublak-Cublak Suweng)")
+st.caption("Topik: Peluang (Rtnomatematika - Permainan Cublak-Cublak Suweng")
 
-# === Petunjuk pengerjaan ===
+# ===== Petunjuk =====
 with st.expander("📌 Petunjuk Pengerjaan", expanded=True):
     st.markdown("""
     - Masukkan nama kamu terlebih dahulu.
-    - Jawablah 5 soal pilihan ganda yang ditampilkan.
-    - Klik **Kirim Jawaban** di bagian akhir untuk melihat hasil dan skor kamu.
+    - Jawablah semua soal pilihan ganda yang disediakan.
+    - Setelah selesai, klik tombol **Kirim Jawaban** untuk melihat hasil.
     """)
 
-# === Load soal dari model .pkl ===
+# ===== Memuat Soal dari Model =====
 soal_pilgan = joblib.load("hasil_kuis2.pkl")
 
-# === Input nama siswa ===
+# ===== Input Nama Siswa =====
 if "nama_dikunci" not in st.session_state:
     st.session_state.nama_dikunci = False
 
@@ -39,50 +40,40 @@ if not st.session_state.nama_dikunci:
             st.session_state.nama = nama
             st.session_state.nama_dikunci = True
 
-# === Jika nama sudah dikunci, tampilkan soal ===
+# ===== Kuis Dimulai =====
 else:
     st.success(f"Halo, {st.session_state.nama}! Silakan mengerjakan kuis di bawah ini. Semangat ya 🎯")
 
     jawaban_pengguna = []
-    for i, soal in enumerate(soal_pilgan):
-        st.markdown(f"<b>{i+1}. {soal['soal'].replace(chr(10), '<br>')}</b>", unsafe_allow_html=True)
-        jawaban = st.radio("Pilih jawaban kamu:", soal["opsi"], key=f"soal_{i}")
-        jawaban_pengguna.append(jawaban.strip()[:1])  # Ambil huruf A/B/C/D
+    skor = 0
 
-    # === Tombol submit jawaban ===
+    for i, soal in enumerate(soal_pilgan):
+        st.markdown(f"**{i+1}. {soal['soal']}**")
+        pilihan = st.radio("Pilih jawaban kamu:", soal['opsi'], key=f"soal_{i}")
+        jawaban_pengguna.append(pilihan.strip()[:1])
+
     if st.button("📨 Kirim Jawaban"):
-        skor = 0
-        benar = 0
-        salah = 0
         st.subheader("📊 Hasil Jawaban")
+        benar = 0
 
         for i, jawaban in enumerate(jawaban_pengguna):
-            kunci = soal_pilgan[i]["jawaban"]
+            kunci = soal_pilgan[i]['jawaban']
             if jawaban == kunci:
                 st.success(f"Soal {i+1}: ✅ Benar (Jawaban: {kunci})")
-                skor += 1
                 benar += 1
             else:
-                st.error(f"Soal {i+1}: ❌ Salah. Jawaban yang benar: {kunci}")
-                salah += 1
+                st.error(f"Soal {i+1}: ❌ Salah. Jawaban yang benar adalah {kunci}")
 
         total_soal = len(soal_pilgan)
-        nilai = int((skor / total_soal) * 100)
+        nilai = int((benar / total_soal) * 100)
 
-        # === Ringkasan akhir ===
+        # ===== Ringkasan Nilai Akhir =====
         st.markdown("---")
         st.subheader("🎓 Ringkasan Nilai Akhir")
         st.markdown(f"""
-            <div style='
-                background-color:#fffde7;
-                padding: 20px;
-                border-radius: 10px;
-                border: 1px solid #f0e68c;
-                font-size: 16px;
-                line-height: 1.7;
-            '>
-                <b>Nama:</b> {st.session_state.nama}<br>
-                <b>Jawaban Benar:</b> {benar} dari {total_soal} soal<br><br>
-                <span style='font-size:22px; color:#d84315;'>🎉 <b>Nilai Akhir: {nilai}/100</b></span>
+            <div style='background-color: #fffde7; padding: 20px; border-radius: 10px; border: 1px solid #f0e68c;'>
+                <h4>Nama: <b>{st.session_state.nama}</b></h4>
+                <h5>Jawaban Benar: <b>{benar} dari {total_soal} soal</b></h5>
+                <h3 style='color:#d84315;'>🎉 Nilai Akhir: <b>{nilai}/100</b></h3>
             </div>
         """, unsafe_allow_html=True)
