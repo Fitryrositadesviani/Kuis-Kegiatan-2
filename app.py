@@ -48,7 +48,7 @@ else:
     skor = 0
 
     for i, soal in enumerate(soal_pilgan):
-        st.markdown(f"**{i+1}. {soal['soal']}**")
+        st.markdown(f"**{soal['soal']}**")
         pilihan = st.radio("Pilih jawaban kamu:", soal['opsi'], key=f"soal_{i}")
         jawaban_pengguna.append(pilihan.strip()[:1])
 
@@ -71,7 +71,7 @@ else:
         st.markdown("---")
         st.subheader("🎓 Ringkasan Nilai Akhir")
         st.markdown(f"""
-            <div style='background-color: #dec4b0; padding: 20px; border-radius: 10px; border: 1px solid #f0e68c;'>
+            <div style='background-color: #eeeae7; padding: 20px; border-radius: 10px; border: 1px solid #caa994;'>
                 <h4>Nama: <b>{st.session_state.nama}</b></h4>
                 <h5>Jawaban Benar: <b>{benar} dari {total_soal} soal</b></h5>
                 <h3 style='color:#d84315;'>🎉 Nilai Akhir: <b>{nilai}/100</b></h3>
